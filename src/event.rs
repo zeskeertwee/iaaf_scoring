@@ -69,6 +69,11 @@ pub enum OutdoorEvent {
     Walk50km,
 }
 
+pub enum EventCompareType {
+    GreaterIsBetter,
+    SmallerIsBetter,
+}
+
 impl ToCodename for OutdoorEvent {
     fn to_codename(&self) -> &str {
         match self {
@@ -140,6 +145,57 @@ impl OutdoorEvent {
         match self.exclusive_for_gender() {
             None => true,
             Some(specific_gender) => &specific_gender == gender,
+        }
+    }
+
+    pub fn compare_type(&self) -> EventCompareType {
+        match self {
+            OutdoorEvent::HighJump => EventCompareType::GreaterIsBetter,
+            OutdoorEvent::LongJump => EventCompareType::GreaterIsBetter,
+            OutdoorEvent::TripleJump => EventCompareType::GreaterIsBetter,
+            OutdoorEvent::DiscusThrow => EventCompareType::GreaterIsBetter,
+            OutdoorEvent::HammerThrow => EventCompareType::GreaterIsBetter,
+            OutdoorEvent::JavelinThrow => EventCompareType::GreaterIsBetter,
+            OutdoorEvent::PoleVault => EventCompareType::GreaterIsBetter,
+            OutdoorEvent::ShortPut => EventCompareType::GreaterIsBetter,
+            OutdoorEvent::Heptathlon => EventCompareType::GreaterIsBetter,
+            OutdoorEvent::Decathlon => EventCompareType::GreaterIsBetter,
+
+            OutdoorEvent::Track100m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track200m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track300m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track400m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track100mHurdles => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track110mHurdles => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track400mHurdles => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track2kmSteeplechase => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track3kmSteeplechase => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track4x100mRelay => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track4x200mRelay => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track4x400mRelay => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track600m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track800m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track1000m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track1500m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track1Mile => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track2000m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track5000m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Track10000m => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Road10km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Road15km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Road20km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Road25km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Road30km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Road100km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Road10Miles => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::HalfMarathon => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Marathon => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Walk3km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Walk5km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Walk10km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Walk20km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Walk30km => EventCompareType::SmallerIsBetter,
+            OutdoorEvent::Walk50km => EventCompareType::SmallerIsBetter,
         }
     }
 }

@@ -3,10 +3,10 @@ use std::time::Duration;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum Preformance {
-    /// Preformance is measured in distance (HJ, LJ, etc.)
+    /// Preformance is measured in distance (m) (HJ, LJ, etc.)
     Distance(f64),
 
-    /// Preformance is measured in time (100m, 400mH, Marathon, etc.)
+    /// Preformance is measured in time (s) (100m, 400mH, Marathon, etc.)
     Time(Duration),
 
     /// Preformance is measured in points (Decathlon, Heptathlon)

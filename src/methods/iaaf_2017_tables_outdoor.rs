@@ -1,4 +1,4 @@
-use crate::event::OutdoorEvent;
+use crate::event::{OutdoorEvent, EventCompareType};
 use crate::gender::Gender;
 use crate::methods::ScoringMethod;
 use crate::preformance::Preformance;
@@ -37,10 +37,27 @@ impl ScoringMethod for Iaaf2017Tables {
         }
 
         match self.loaded_tables.get(&(event, gender)) {
-            Some(table) => table
-                .iter()
-                .find(|i| i.performance == performance.to_number())
-                .map(|i| i.points),
+            Some(table) => {
+                // The table is sorted
+                for (idx, perf) in table.iter().enumerate() {
+                    match event.compare_type() {
+                        EventCompareType::SmallerIsBetter => {
+                            if perf.performance >= performance.to_number() {
+                                return Some(perf.points)
+                            }
+                        },
+                        EventCompareType::GreaterIsBetter => {
+                            dbg!(perf.performance, performance.to_number());
+                            if perf.performance <= performance.to_number() {
+                                return Some(perf.points)
+                            }
+                        }
+                    }
+                }
+
+                // Falls outside of the table
+                Some(0)
+            },
             None => {
                 self.load_table(event, gender);
                 self.score(event, gender, performance)
@@ -87,7 +104,7 @@ impl Iaaf2017Tables {
         info!("Loading table '{}'", fname);
         match Tables::get(&fname) {
             Some(data) => {
-                let data: Vec<TableEntry> = csv::ReaderBuilder::new()
+                let mut data: Vec<TableEntry> = csv::ReaderBuilder::new()
                     .delimiter(b',')
                     .has_headers(true)
                     .from_reader(Cursor::new(data.data))
@@ -99,6 +116,11 @@ impl Iaaf2017Tables {
                         points: i[1].parse().unwrap(),
                     })
                     .collect();
+
+                match event.compare_type() {
+                    EventCompareType::SmallerIsBetter => data.sort_by(|a, b| a.performance.total_cmp(&b.performance)),
+                    EventCompareType::GreaterIsBetter => data.sort_by(|a, b| b.performance.total_cmp(&a.performance))
+                }
 
                 self.loaded_tables.insert((event, gender), data);
                 info!(
