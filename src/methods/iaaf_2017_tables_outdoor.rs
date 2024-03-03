@@ -18,7 +18,7 @@ struct TableEntry {
 }
 
 #[derive(RustEmbed)]
-#[folder = "resources/iaaf_2017_tables"]
+#[folder = "resources/iaaf_2017_tables_outdoor"]
 struct Tables;
 
 pub struct Iaaf2017Tables {
