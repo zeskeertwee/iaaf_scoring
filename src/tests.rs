@@ -8,6 +8,8 @@ use crate::preformance::Preformance;
 fn test_out_of_table_preformance() {
     let mut tables = iaaf_2017_tables_outdoor::Iaaf2017Tables::new();
 
+    assert_eq!(tables.score(OutdoorEvent::Track200m, Gender::Male, Preformance::Time(Duration::from_millis(26150))).unwrap(), 444);
+
     // falls in between two table entries
     assert_eq!(tables.score(OutdoorEvent::Track100m, Gender::Male, Preformance::Time(Duration::from_millis(15340))).unwrap(), 67);
 
