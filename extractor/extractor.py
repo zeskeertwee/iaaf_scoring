@@ -1,10 +1,12 @@
+import os.path
+
 from tabula import read_pdf
 from os.path import exists
-import pandas as pd
-import pickle, datetime
+import pickle, datetime, csv
 
-def extract_frame(file: str):
-    pickle_fname = file.replace(".pdf", ".pkl")
+
+def extract_frame(file: str, ext: str, pages: (int, int)):
+    pickle_fname = file.replace(".pdf", ext + ".pkl")
 
     if exists(pickle_fname):
         print("Reading dataframe from " + pickle_fname)
@@ -14,7 +16,7 @@ def extract_frame(file: str):
         return df
 
     print("Extracting dataframe from " + file)
-    df = read_pdf(file, pages='all')
+    df = read_pdf(file, pages=(str(pages[0]) + "-" + str(pages[1])))
     print("Saving dataframe to " + pickle_fname)
     file = open(pickle_fname, "wb")
     pickle.dump(df, file)
@@ -36,15 +38,24 @@ def parse_timetamp(ts: str):
             pass
     return None
 
-def extract_data(file: str, export: str):
-    df = extract_frame(file)
 
+def generate_tables(df):
     tables = {}
 
     print("Analyzing data")
     for frame in df:
         headers = list(frame)
         print("Found headers " + str(headers))
+
+        unnamed = False
+        for h in headers:
+            if "Unnamed" in h:
+                unnamed = True
+                break
+
+        if unnamed:
+            print("Skipping unnamed header")
+            continue
 
         for header in headers:
             if header == "Points":
@@ -57,7 +68,8 @@ def extract_data(file: str, export: str):
                 nperf = parse_timetamp(str(perf))
                 sperf = 0.0
                 if nperf:
-                    sperf = float(nperf.second) + float(nperf.microsecond) / pow(10, 6) + float(nperf.minute) * 60 + float(nperf.hour) * (60*60)
+                    sperf = float(nperf.second) + float(nperf.microsecond) / pow(10, 6) + float(
+                        nperf.minute) * 60 + float(nperf.hour) * (60 * 60)
                 else:
                     # probably heptalon/pentalon point count
                     sperf = int(perf)
@@ -68,9 +80,48 @@ def extract_data(file: str, export: str):
                 if not header in tables.keys():
                     tables[header] = []
 
-                tables[header].append((points, sperf))
+                tables[header].append((sperf, points))
+
+    sorted_tables = {}
+    for key in list(tables):
+        print("Sorted table " + key)
+        sorted_tables[key] = sorted(tables[key], key=lambda perf: -perf[1])
+
+    return sorted_tables
+
+
+def save_table(table, file: str):
+    f = open(file, "w")
+    writer = csv.writer(f)
+
+    writer.writerow(['performance', 'points'])
+    writer.writerows(table)
+
+    f.close()
+    print("Wrote " + file)
+
+
+def extract_data(file: str, folder: str, export: str, m_pages: (int, int), w_pages: (int, int)):
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
+    dfm = extract_frame(file, "-M", m_pages)
+    tables_m = generate_tables(dfm)
+
+    for i in list(tables_m):
+        path = folder + export + " - MALE - " + i + ".csv"
+        save_table(tables_m[i], path)
+
+    dfw = extract_frame(file, "-W", w_pages)
+    tables_w = generate_tables(dfw)
+
+    for i in list(tables_w):
+        path = folder + export + " - FEMALE - " + i + ".csv"
+        save_table(tables_w[i], path)
 
     #print(str(tables))
 
-extract_data("WA-2022-Indoor.pdf", "WA-2022-Indoor")
-extract_data("WA-2022-Outdoor.pdf", "WA-2022-Outdoor")
+
+folder = "../resources/wa_2022_tables_"
+extract_data("WA-2022-Indoor.pdf", folder + "indoor/","Table Indoor 2022", (7,154), (157, 304))
+extract_data("WA-2022-Outdoor.pdf", folder + "outdoor/", "Table Outdoor 2022", (9, 276), (279, 546))
