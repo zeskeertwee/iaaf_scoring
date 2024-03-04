@@ -2,7 +2,7 @@ import os.path
 
 from tabula import read_pdf
 from os.path import exists
-import pickle, datetime, csv
+import pickle, datetime, csv, math
 
 
 def extract_frame(file: str, ext: str, pages: (int, int)):
@@ -65,14 +65,22 @@ def generate_tables(df):
                 if perf == "-":
                     continue
 
+                if type(perf) is float:
+                    if math.isnan(perf):
+                        continue
+
                 nperf = parse_timetamp(str(perf))
                 sperf = 0.0
                 if nperf:
                     sperf = float(nperf.second) + float(nperf.microsecond) / pow(10, 6) + float(
                         nperf.minute) * 60 + float(nperf.hour) * (60 * 60)
                 else:
-                    # probably heptalon/pentalon point count
-                    sperf = int(perf)
+                    try:
+                        # probably heptalon/pentalon point count
+                        sperf = int(perf)
+                    except:
+                        print("Failed to parse " + str(perf))
+                        raise Exception("Parsing failure")
 
                 sperf = round(sperf, 3)
                 points = int(frame["Points"][idx])
@@ -101,6 +109,11 @@ def save_table(table, file: str):
     print("Wrote " + file)
 
 
+replacements = {
+    "Hept.": "Heptathlon",
+    "Pent.": "Pentathlon"
+}
+
 def extract_data(file: str, folder: str, export: str, m_pages: (int, int), w_pages: (int, int)):
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -109,19 +122,37 @@ def extract_data(file: str, folder: str, export: str, m_pages: (int, int), w_pag
     tables_m = generate_tables(dfm)
 
     for i in list(tables_m):
-        path = folder + export + " - MALE - " + i + ".csv"
+        dispi = i
+        if dispi in replacements:
+            dispi = replacements[dispi]
+
+        if "." in dispi:
+            raise Exception("Abbreviation not replaced! " + dispi)
+
+        path = folder + export + " - MALE - " + dispi + ".csv"
         save_table(tables_m[i], path)
 
     dfw = extract_frame(file, "-W", w_pages)
     tables_w = generate_tables(dfw)
 
     for i in list(tables_w):
-        path = folder + export + " - FEMALE - " + i + ".csv"
+        dispi = i
+        if dispi in replacements:
+            dispi = replacements[dispi]
+
+        if "." in dispi:
+            raise Exception("Abbreviation not replaced! " + dispi)
+
+        path = folder + export + " - FEMALE - " + dispi + ".csv"
         save_table(tables_w[i], path)
 
     #print(str(tables))
 
 
-folder = "../resources/wa_2022_tables_"
-extract_data("WA-2022-Indoor.pdf", folder + "indoor/","Table Indoor 2022", (7,154), (157, 304))
-extract_data("WA-2022-Outdoor.pdf", folder + "outdoor/", "Table Outdoor 2022", (9, 276), (279, 546))
+folder2022 = "../resources/wa_2022_tables_"
+folder2017 = "../resources/iaaf_2017_tables_"
+
+extract_data("IAAF-2017-Indoor.pdf", folder2017 + "indoor/", "Table Indoor 2017", (10, 127), (130, 247))
+extract_data("IAAF-2017-Outdoor.pdf", folder2017 + "outdoor/", "Table Outdoor 2017", (10, 187), (190, 367))
+extract_data("WA-2022-Indoor.pdf", folder2022 + "indoor/","Table Indoor 2022", (7,154), (157, 304))
+extract_data("WA-2022-Outdoor.pdf", folder2022 + "outdoor/", "Table Outdoor 2022", (9, 276), (279, 546))
