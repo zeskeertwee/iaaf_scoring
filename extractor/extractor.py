@@ -15,8 +15,9 @@ def extract_frame(file: str, ext: str, pages: (int, int)):
         file.close()
         return df
 
-    print("Extracting dataframe from " + file)
-    df = read_pdf(file, pages=(str(pages[0]) + "-" + str(pages[1])))
+    pagerange = str(pages[0]) + "-" + str(pages[1])
+    print("Extracting dataframe from " + file + " (Pages " + pagerange + ") - SEN" + ext)
+    df = read_pdf(file, pages=pagerange)
     print("Saving dataframe to " + pickle_fname)
     file = open(pickle_fname, "wb")
     pickle.dump(df, file)
