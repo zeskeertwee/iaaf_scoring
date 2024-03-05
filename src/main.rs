@@ -4,6 +4,7 @@ use iaaf_scoring::preformance::Preformance;
 
 fn main() {
     pretty_env_logger::init();
+
     let mut table = iaaf_scoring::methods::iaaf_2017_tables_outdoor::Iaaf2017Tables::new();
     //table.load_all_tables();
 

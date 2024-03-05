@@ -6,6 +6,7 @@ pub mod preformance;
 
 #[cfg(test)]
 mod tests;
-trait ToCodename {
+trait Codename {
     fn to_codename(&self) -> &str;
+    fn from_codename(code: &str) -> Option<Self> where Self: Sized;
 }

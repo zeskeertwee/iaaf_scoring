@@ -112,7 +112,33 @@ def save_table(table, file: str):
 
 replacements = {
     "Hept.": "Heptathlon",
-    "Pent.": "Pentathlon"
+    "Pent.": "Pentathlon",
+    "2000mSC": "2000m SC",
+    "3000mSC": "3000m SC",
+    "10,000m": "10000m",
+    "5km": "5 km",
+    "10km": "10 km",
+    "15km": "15 km",
+    "20km": "20 km",
+    "25km": "25 km",
+    "30km": "30 km",
+    "100km": "100 km",
+
+    "3kmW": "3km W",
+    "5kmW": "5km W",
+    "10kmW": "10km W",
+    "15kmW": "15km W",
+    "20kmW": "20km W",
+    "30kmW": "30km W",
+    "35kmW": "35km W",
+    "50kmW": "50km W",
+
+    "10,000mW": "10000mW",
+    "15,000mW": "15000mW",
+    "20,000mW": "20000mW",
+    "30,000mW": "30000mW",
+    "35,000mW": "35000mW",
+    "50,000mW": "50000mW"
 }
 
 def extract_data(file: str, folder: str, export: str, m_pages: (int, int), w_pages: (int, int)):

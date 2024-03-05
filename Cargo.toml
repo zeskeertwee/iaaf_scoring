@@ -14,9 +14,12 @@ name = "iaaf_scoring_test"
 path = "src/main.rs"
 
 [dependencies]
-rust-embed = "6.4.1"
+rust-embed = { version = "6.4.1", features = ["include-exclude"] }
 csv = "1.1.6"
 serde = { version = "1.0.144", features = ["derive"] }
 log = "0.4.17"
 pretty_env_logger = "0.4.0"
 strum = { version = "0.24.1", features = ["derive"] }
+lazy_static = "1.4.0"
+lzma-rs = "0.3.0"
+tar = "0.4.40"
